@@ -1,0 +1,1 @@
+D:/Code/Blurbo/build/GLAD.dir/MinSizeRel/gl.obj

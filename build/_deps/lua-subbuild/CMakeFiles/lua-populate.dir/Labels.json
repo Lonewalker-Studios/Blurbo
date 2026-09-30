@@ -1,0 +1,46 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "D:/Code/Blurbo/build/_deps/lua-subbuild/CMakeFiles/lua-populate"
+		},
+		{
+			"file" : "D:/Code/Blurbo/build/_deps/lua-subbuild/CMakeFiles/2a34c6d1351eb31d9b02f438259f5547/lua-populate.rule"
+		},
+		{
+			"file" : "D:/Code/Blurbo/build/_deps/lua-subbuild/CMakeFiles/e658e12997f0ab8d73433300d5e82ec5/lua-populate-complete.rule"
+		},
+		{
+			"file" : "D:/Code/Blurbo/build/_deps/lua-subbuild/CMakeFiles/63f650625e3773a943be600ca15f0a3a/lua-populate-build.rule"
+		},
+		{
+			"file" : "D:/Code/Blurbo/build/_deps/lua-subbuild/CMakeFiles/63f650625e3773a943be600ca15f0a3a/lua-populate-configure.rule"
+		},
+		{
+			"file" : "D:/Code/Blurbo/build/_deps/lua-subbuild/CMakeFiles/63f650625e3773a943be600ca15f0a3a/lua-populate-download.rule"
+		},
+		{
+			"file" : "D:/Code/Blurbo/build/_deps/lua-subbuild/CMakeFiles/63f650625e3773a943be600ca15f0a3a/lua-populate-install.rule"
+		},
+		{
+			"file" : "D:/Code/Blurbo/build/_deps/lua-subbuild/CMakeFiles/63f650625e3773a943be600ca15f0a3a/lua-populate-mkdir.rule"
+		},
+		{
+			"file" : "D:/Code/Blurbo/build/_deps/lua-subbuild/CMakeFiles/63f650625e3773a943be600ca15f0a3a/lua-populate-patch.rule"
+		},
+		{
+			"file" : "D:/Code/Blurbo/build/_deps/lua-subbuild/CMakeFiles/63f650625e3773a943be600ca15f0a3a/lua-populate-test.rule"
+		},
+		{
+			"file" : "D:/Code/Blurbo/build/_deps/lua-subbuild/CMakeFiles/63f650625e3773a943be600ca15f0a3a/lua-populate-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"lua-populate"
+		],
+		"name" : "lua-populate"
+	}
+}

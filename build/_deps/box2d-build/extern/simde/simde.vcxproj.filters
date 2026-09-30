@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="D:\Code\Blurbo\build\_deps\box2d-src\extern\simde\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="D:\Code\Blurbo\build\_deps\box2d-src\extern\simde\check.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="D:\Code\Blurbo\build\_deps\box2d-src\extern\simde\debug-trap.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="D:\Code\Blurbo\build\_deps\box2d-src\extern\simde\hedley.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="D:\Code\Blurbo\build\_deps\box2d-src\extern\simde\simde-aes.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="D:\Code\Blurbo\build\_deps\box2d-src\extern\simde\simde-align.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="D:\Code\Blurbo\build\_deps\box2d-src\extern\simde\simde-arch.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="D:\Code\Blurbo\build\_deps\box2d-src\extern\simde\simde-common.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="D:\Code\Blurbo\build\_deps\box2d-src\extern\simde\simde-constify.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="D:\Code\Blurbo\build\_deps\box2d-src\extern\simde\simde-detect-clang.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="D:\Code\Blurbo\build\_deps\box2d-src\extern\simde\simde-diagnostic.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="D:\Code\Blurbo\build\_deps\box2d-src\extern\simde\simde-f16.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="D:\Code\Blurbo\build\_deps\box2d-src\extern\simde\simde-features.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="D:\Code\Blurbo\build\_deps\box2d-src\extern\simde\simde-math.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="D:\Code\Blurbo\build\_deps\box2d-src\extern\simde\x86\aes.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="D:\Code\Blurbo\build\_deps\box2d-src\extern\simde\x86\avx.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="D:\Code\Blurbo\build\_deps\box2d-src\extern\simde\x86\avx2.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="D:\Code\Blurbo\build\_deps\box2d-src\extern\simde\x86\f16c.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="D:\Code\Blurbo\build\_deps\box2d-src\extern\simde\x86\fma.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="D:\Code\Blurbo\build\_deps\box2d-src\extern\simde\x86\mmx.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="D:\Code\Blurbo\build\_deps\box2d-src\extern\simde\x86\sse.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="D:\Code\Blurbo\build\_deps\box2d-src\extern\simde\x86\sse2.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="D:\Code\Blurbo\build\_deps\box2d-src\extern\simde\x86\sse3.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="D:\Code\Blurbo\build\_deps\box2d-src\extern\simde\x86\sse4.1.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="D:\Code\Blurbo\build\_deps\box2d-src\extern\simde\x86\sse4.2.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="D:\Code\Blurbo\build\_deps\box2d-src\extern\simde\x86\ssse3.h">
+      <Filter>Header Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{E196ACF1-F9DE-33A4-A0E6-87841D6D4117}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

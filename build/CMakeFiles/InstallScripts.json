@@ -1,0 +1,13 @@
+{
+	"InstallScripts" : 
+	[
+		"D:/Code/Blurbo/build/cmake_install.cmake",
+		"D:/Code/Blurbo/build/_deps/sdl3-build/cmake_install.cmake",
+		"D:/Code/Blurbo/build/_deps/box2d-build/cmake_install.cmake",
+		"D:/Code/Blurbo/build/_deps/box2d-build/extern/simde/cmake_install.cmake",
+		"D:/Code/Blurbo/build/_deps/box2d-build/src/cmake_install.cmake",
+		"D:/Code/Blurbo/build/_deps/entt-build/cmake_install.cmake",
+		"D:/Code/Blurbo/build/_deps/glad-build/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

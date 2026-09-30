@@ -1,0 +1,14 @@
+# Target labels
+ box2d-populate
+# Source files and their labels
+D:/Code/Blurbo/build/_deps/box2d-subbuild/CMakeFiles/box2d-populate
+D:/Code/Blurbo/build/_deps/box2d-subbuild/CMakeFiles/fa8e2e77d3694056d3de44272d87c030/box2d-populate.rule
+D:/Code/Blurbo/build/_deps/box2d-subbuild/CMakeFiles/2644620dd1a52277140a2df391872d17/box2d-populate-complete.rule
+D:/Code/Blurbo/build/_deps/box2d-subbuild/CMakeFiles/e02e2be9964ad13d0a5a72ea550e264d/box2d-populate-build.rule
+D:/Code/Blurbo/build/_deps/box2d-subbuild/CMakeFiles/e02e2be9964ad13d0a5a72ea550e264d/box2d-populate-configure.rule
+D:/Code/Blurbo/build/_deps/box2d-subbuild/CMakeFiles/e02e2be9964ad13d0a5a72ea550e264d/box2d-populate-download.rule
+D:/Code/Blurbo/build/_deps/box2d-subbuild/CMakeFiles/e02e2be9964ad13d0a5a72ea550e264d/box2d-populate-install.rule
+D:/Code/Blurbo/build/_deps/box2d-subbuild/CMakeFiles/e02e2be9964ad13d0a5a72ea550e264d/box2d-populate-mkdir.rule
+D:/Code/Blurbo/build/_deps/box2d-subbuild/CMakeFiles/e02e2be9964ad13d0a5a72ea550e264d/box2d-populate-patch.rule
+D:/Code/Blurbo/build/_deps/box2d-subbuild/CMakeFiles/e02e2be9964ad13d0a5a72ea550e264d/box2d-populate-test.rule
+D:/Code/Blurbo/build/_deps/box2d-subbuild/CMakeFiles/e02e2be9964ad13d0a5a72ea550e264d/box2d-populate-update.rule

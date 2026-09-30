@@ -1,0 +1,1 @@
+--out-path D:/Code/Blurbo/build/gladsources/GLAD --api gl:compatibility=4.6 --reproducible c 

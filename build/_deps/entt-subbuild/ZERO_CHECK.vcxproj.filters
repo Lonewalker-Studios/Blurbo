@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="D:\Code\Blurbo\build\_deps\entt-subbuild\CMakeFiles\cc2d05f55ea90ef795371b6a55206ed1\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{9CDFCF6C-2AA5-34AE-A7D5-ECCA5CC220A3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
