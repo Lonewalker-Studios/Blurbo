@@ -160,6 +160,7 @@ target_link_libraries(blurbo_utilities PUBLIC
     sol2
     box2d
     glm
+    SDL3::SDL3
 )
 
 file(GLOB_RECURSE BLURBO_WINDOW_SOURCES CONFIGURE_DEPENDS
