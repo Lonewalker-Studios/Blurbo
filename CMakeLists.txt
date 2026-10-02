@@ -61,7 +61,14 @@ FetchContent_Declare(
     SOURCE_SUBDIR  "__download_only__"
 )
 
-FetchContent_MakeAvailable(SDL3 box2d entt lua sol2)
+FetchContent_Declare(
+    glm
+    GIT_REPOSITORY "https://github.com/g-truc/glm.git"
+    GIT_TAG        "1.0.1"
+    SOURCE_SUBDIR  "__download_only__"
+)
+
+FetchContent_MakeAvailable(SDL3 box2d entt lua sol2 glm)
 
 file(GLOB LUA_SOURCES "${lua_SOURCE_DIR}/*.c")
 list(FILTER LUA_SOURCES EXCLUDE REGEX ".*/(lua|luac|onelua|ltests)\\.c$")
@@ -81,6 +88,10 @@ add_library(sol2 INTERFACE)
 target_include_directories(sol2 INTERFACE ${sol2_SOURCE_DIR}/include)
 target_link_libraries(sol2 INTERFACE lua)
 target_compile_definitions(sol2 INTERFACE SOL_ALL_SAFETIES_ON=1)
+
+
+add_library(glm INTERFACE)
+target_include_directories(glm INTERFACE ${glm_SOURCE_DIR})
 
 FetchContent_Declare(
     glad
@@ -144,10 +155,10 @@ target_include_directories(blurbo_utilities PUBLIC
 )
 
 target_link_libraries(blurbo_utilities PUBLIC
-    SDL3::SDL3
     EnTT::EnTT
     sol2
     box2d
+    glm
 )
 
 file(GLOB_RECURSE BLURBO_WINDOW_SOURCES CONFIGURE_DEPENDS
@@ -196,6 +207,7 @@ target_link_libraries(blurbo_editor PRIVATE
     EnTT::EnTT
     sol2
     box2d
+    glm
 )
 
 if(WIN32)
