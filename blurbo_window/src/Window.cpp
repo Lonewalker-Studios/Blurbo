@@ -1,6 +1,7 @@
 #include "Window.h"
 #include <iostream>
 #include <string>
+
 namespace blurbo_window {
 	Window::Window(const std::string title, int width, int height, int x, int y, bool vSync, Uint32 windowFlags)
 		: windowPtr{ nullptr }, glContext{}, title{title}, width{width}, height{height}, x{x}, y{y}, windowFlags{windowFlags}
@@ -25,6 +26,16 @@ namespace blurbo_window {
 		}
 	}
 	void Window::createWindow(Uint32 windowFlags) {
-		windowPtr = std::shared_ptr<SDL_Window>(SDL_CreateWindow(title.c_str(), x, y, width, height, windowFlags), SDL_DestroyWindow);
+		windowPtr = std::shared_ptr<SDL_Window>(
+			SDL_CreateWindow(title.c_str(), width, height, windowFlags),
+			[](SDL_Window* p) { SDL_DestroyWindow(p); }
+		);
+		if (windowPtr) {
+			SDL_SetWindowPosition(windowPtr.get(), x, y);
+		}
+		if (!windowPtr) {
+			std::string error = SDL_GetError();
+			std::cout << "Error! " + error << std::endl;
+		}
 	}
 }

@@ -4,7 +4,7 @@
 #include <memory>
 
 namespace blurbo_window {
-	using WindowPtr = std::shared_ptr<Window>;
+	using WindowPtr = std::shared_ptr<SDL_Window>;
 
 	class Window {
 	private:
@@ -20,7 +20,7 @@ namespace blurbo_window {
 		}
 		Window(const std::string title, int width, int height, int x, int y, bool vSync = true, Uint32 windowFlags = (SDL_WINDOW_OPENGL));
 		~Window();
-		inline void setGLContext(SDL_GLContext& glContext) { this->glContext = glContext; }
+		inline void setGLContext(SDL_GLContext glContext) { this->glContext = glContext; }
 		inline SDL_GLContext getGLContext() const { return glContext; }
 		inline WindowPtr& getWindow() { return windowPtr; }
 		inline const std::string& getWindowTitle() const { return title; }
