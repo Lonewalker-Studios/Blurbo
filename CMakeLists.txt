@@ -47,7 +47,7 @@ FetchContent_Declare(
     GIT_TAG        "v4.0.0"
 )
 
-# Lua stays on 5.4.x: sol2 does not support Lua 5.5 yet
+
 FetchContent_Declare(
     lua
     GIT_REPOSITORY "https://github.com/lua/lua.git"
@@ -90,7 +90,7 @@ target_include_directories(sol2 INTERFACE ${sol2_SOURCE_DIR}/include)
 target_link_libraries(sol2 INTERFACE lua)
 target_compile_definitions(sol2 INTERFACE SOL_ALL_SAFETIES_ON=1)
 
-# GLM is header-only; headers live in the repo root (include as <glm/glm.hpp>)
+
 add_library(glm INTERFACE)
 target_include_directories(glm INTERFACE ${glm_SOURCE_DIR})
 
