@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.28)
 
 get_filename_component(PARENT_DIR "${CMAKE_CURRENT_SOURCE_DIR}" NAME)
 string(REPLACE " " "_" PROJECT_SAFE_NAME "${PARENT_DIR}")
@@ -23,7 +23,7 @@ include(FetchContent)
 FetchContent_Declare(
     SDL3
     GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git"
-    GIT_TAG        "release-3.2.20"
+    GIT_TAG        "release-3.4.14"
 )
 set(SDL_SHARED ON CACHE BOOL "" FORCE)
 set(SDL_STATIC OFF CACHE BOOL "" FORCE)
@@ -34,7 +34,7 @@ set(SDL_EXAMPLES OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(
     box2d
     GIT_REPOSITORY "https://github.com/erincatto/box2d.git"
-    GIT_TAG        "v3.0.0"
+    GIT_TAG        "v3.1.1"
 )
 set(BOX2D_SAMPLES OFF CACHE INTERNAL "")
 set(BOX2D_BENCHMARKS OFF CACHE INTERNAL "")
@@ -44,13 +44,14 @@ set(BOX2D_UNIT_TESTS OFF CACHE INTERNAL "")
 FetchContent_Declare(
     entt
     GIT_REPOSITORY "https://github.com/skypjack/entt.git"
-    GIT_TAG        "v3.15.0"
+    GIT_TAG        "v4.0.0"
 )
 
+# Lua stays on 5.4.x: sol2 does not support Lua 5.5 yet
 FetchContent_Declare(
     lua
     GIT_REPOSITORY "https://github.com/lua/lua.git"
-    GIT_TAG        "v5.4.7"
+    GIT_TAG        "v5.4.8"
     SOURCE_SUBDIR  "__download_only__"
 )
 
@@ -64,7 +65,7 @@ FetchContent_Declare(
 FetchContent_Declare(
     glm
     GIT_REPOSITORY "https://github.com/g-truc/glm.git"
-    GIT_TAG        "1.0.1"
+    GIT_TAG        "1.0.3"
     SOURCE_SUBDIR  "__download_only__"
 )
 
@@ -89,7 +90,7 @@ target_include_directories(sol2 INTERFACE ${sol2_SOURCE_DIR}/include)
 target_link_libraries(sol2 INTERFACE lua)
 target_compile_definitions(sol2 INTERFACE SOL_ALL_SAFETIES_ON=1)
 
-
+# GLM is header-only; headers live in the repo root (include as <glm/glm.hpp>)
 add_library(glm INTERFACE)
 target_include_directories(glm INTERFACE ${glm_SOURCE_DIR})
 
