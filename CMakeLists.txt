@@ -18,6 +18,7 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 include(FetchContent)
 
+
 FetchContent_Declare(
     zlib
     GIT_REPOSITORY "https://github.com/madler/zlib.git"
@@ -32,6 +33,38 @@ FetchContent_Declare(
 )
 set(LIBUSB_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(LIBUSB_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+
+FetchContent_MakeAvailable(zlib libusb)
+
+
+if(TARGET zlib)
+    set(ZLIB_FOUND TRUE CACHE BOOL "" FORCE)
+    set(ZLIB_LIBRARY zlib CACHE STRING "" FORCE)
+    set(ZLIB_LIBRARIES zlib CACHE STRING "" FORCE)
+    set(ZLIB_INCLUDE_DIR "zlibSOURCEDIR;{zlib_BINARY_DIR}" CACHE STRING "" FORCE)
+    set(ZLIB_INCLUDE_DIRS "zlibSOURCEDIR;{zlib_BINARY_DIR}" CACHE STRING "" FORCE)
+    set(ZLIB_VERSION_STRING "1.3.1" CACHE STRING "" FORCE)
+    if(NOT TARGET ZLIB::ZLIB)
+        add_library(ZLIB::ZLIB ALIAS zlib)
+    endif()
+elseif(TARGET zlibstatic)
+    set(ZLIB_FOUND TRUE CACHE BOOL "" FORCE)
+    set(ZLIB_LIBRARY zlibstatic CACHE STRING "" FORCE)
+    set(ZLIB_LIBRARIES zlibstatic CACHE STRING "" FORCE)
+    set(ZLIB_INCLUDE_DIR "zlibSOURCEDIR;{zlib_BINARY_DIR}" CACHE STRING "" FORCE)
+    set(ZLIB_INCLUDE_DIRS "zlibSOURCEDIR;{zlib_BINARY_DIR}" CACHE STRING "" FORCE)
+    set(ZLIB_VERSION_STRING "1.3.1" CACHE STRING "" FORCE)
+    if(NOT TARGET ZLIB::ZLIB)
+        add_library(ZLIB::ZLIB ALIAS zlibstatic)
+    endif()
+endif()
+
+if(TARGET usb-1.0 AND NOT TARGET LibUSB::LibUSB)
+    add_library(LibUSB::LibUSB ALIAS usb-1.0)
+    set(LibUSB_FOUND TRUE CACHE BOOL "" FORCE)
+    set(LIBUSB_FOUND TRUE CACHE BOOL "" FORCE)
+endif()
+
 
 FetchContent_Declare(
     SDL3
@@ -148,29 +181,8 @@ FetchContent_Declare(
     GIT_TAG        "10.0.0"
 )
 
-FetchContent_MakeAvailable(zlib libusb SDL3 SDL3_image box2d entt lua sol2 glm fmt)
+FetchContent_MakeAvailable(SDL3 SDL3_image box2d entt lua sol2 glm fmt libzip libzippp tinyxml2)
 
-if(TARGET zlib AND NOT TARGET ZLIB::ZLIB)
-    add_library(ZLIB::ZLIB ALIAS zlib)
-    set(ZLIB_FOUND TRUE CACHE BOOL "" FORCE)
-    set(ZLIB_LIBRARIES zlib CACHE STRING "" FORCE)
-    set(ZLIB_INCLUDE_DIRS "zlibSOURCEDIR;{zlib_BINARY_DIR}" CACHE STRING "" FORCE)
-    set(ZLIB_VERSION_STRING "1.3.1" CACHE STRING "" FORCE)
-elseif(TARGET zlibstatic AND NOT TARGET ZLIB::ZLIB)
-    add_library(ZLIB::ZLIB ALIAS zlibstatic)
-    set(ZLIB_FOUND TRUE CACHE BOOL "" FORCE)
-    set(ZLIB_LIBRARIES zlibstatic CACHE STRING "" FORCE)
-    set(ZLIB_INCLUDE_DIRS "zlibSOURCEDIR;{zlib_BINARY_DIR}" CACHE STRING "" FORCE)
-    set(ZLIB_VERSION_STRING "1.3.1" CACHE STRING "" FORCE)
-endif()
-
-if(TARGET usb-1.0 AND NOT TARGET LibUSB::LibUSB)
-    add_library(LibUSB::LibUSB ALIAS usb-1.0)
-    set(LibUSB_FOUND TRUE CACHE BOOL "" FORCE)
-    set(LIBUSB_FOUND TRUE CACHE BOOL "" FORCE)
-endif()
-
-FetchContent_MakeAvailable(libzip libzippp tinyxml2)
 
 file(GLOB LUA_SOURCES "${lua_SOURCE_DIR}/*.c")
 list(FILTER LUA_SOURCES EXCLUDE REGEX ".*/(lua|luac|onelua|ltests)\\.c$")
@@ -232,6 +244,7 @@ FetchContent_MakeAvailable(glad)
 
 find_package(OpenGL REQUIRED)
 
+
 set(BLURBO_PROJECTS blurbo_utilities blurbo_window blurbo_editor)
 
 foreach(BLURBO_PROJ IN LISTS BLURBO_PROJECTS)
@@ -265,6 +278,7 @@ endforeach()
 
 glad_add_library(GLAD SHARED REPRODUCIBLE API gl:compatibility=4.6)
 
+# blurbo_utilities
 file(GLOB_RECURSE BLURBO_UTILITIES_SOURCES CONFIGURE_DEPENDS
     "blurbo_utilities/src/*.cpp"
     "blurbo_utilities/src/*.hpp"
@@ -298,6 +312,7 @@ target_link_libraries(blurbo_utilities PUBLIC
     LibUSB::LibUSB
 )
 
+# blurbo_window
 file(GLOB_RECURSE BLURBO_WINDOW_SOURCES CONFIGURE_DEPENDS
     "blurbo_window/src/*.cpp"
     "blurbo_window/src/*.hpp"
@@ -323,6 +338,7 @@ target_link_libraries(blurbo_window PUBLIC
     LibUSB::LibUSB
 )
 
+# blurbo_editor
 file(GLOB_RECURSE BLURBO_EDITOR_SOURCES CONFIGURE_DEPENDS
     "blurbo_editor/src/*.cpp"
     "blurbo_editor/src/*.hpp"
