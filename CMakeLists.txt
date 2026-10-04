@@ -109,13 +109,6 @@ FetchContent_Declare(
 )
 
 FetchContent_Declare(
-    zlib
-    GIT_REPOSITORY "https://github.com/madler/zlib.git"
-    GIT_TAG        "v1.3.1"
-)
-set(ZLIB_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-
-FetchContent_Declare(
     libzip
     GIT_REPOSITORY "https://github.com/nih-at/libzip.git"
     GIT_TAG        "v1.10.1"
@@ -138,13 +131,13 @@ FetchContent_Declare(
     GIT_TAG        "10.0.0"
 )
 
-FetchContent_MakeAvailable(SDL3 SDL3_image box2d entt lua sol2 glm fmt zlib)
+FetchContent_MakeAvailable(SDL3 SDL3_image box2d entt lua sol2 glm fmt)
 
-if(TARGET zlibstatic)
+if(TARGET zlibstatic AND NOT TARGET ZLIB::ZLIB)
     add_library(ZLIB::ZLIB ALIAS zlibstatic)
     set(ZLIB_FOUND TRUE CACHE BOOL "" FORCE)
     set(ZLIB_LIBRARIES zlibstatic CACHE STRING "" FORCE)
-    set(ZLIB_INCLUDE_DIRS "${zlib_SOURCE_DIR};${zlib_BINARY_DIR}" CACHE STRING "" FORCE)
+    set(ZLIB_INCLUDE_DIRS "${sdl3_image_SOURCE_DIR}/external/zlib" "${sdl3_image_BINARY_DIR}/external/zlib" CACHE STRING "" FORCE)
     set(ZLIB_VERSION_STRING "1.3.1" CACHE STRING "" FORCE)
 endif()
 
