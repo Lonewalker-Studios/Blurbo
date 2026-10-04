@@ -18,11 +18,18 @@ set(FETCHCONTENT_QUIET OFF CACHE BOOL "" FORCE)
 set(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
+# Put the exe and every DLL in the same folder (build/bin/<Config>)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 
 include(FetchContent)
+
+
+if(POLICY CMP0169)
+    cmake_policy(SET CMP0169 OLD)
+endif()
 
 
 FetchContent_Declare(
@@ -59,8 +66,13 @@ set(ZLIB_LIBRARY ${BLURBO_ZLIB_TARGET} CACHE STRING "" FORCE)
 set(ZLIB_LIBRARIES ${BLURBO_ZLIB_TARGET} CACHE STRING "" FORCE)
 set(ZLIB_INCLUDE_DIR "${zlib_SOURCE_DIR}" CACHE STRING "" FORCE)
 set(ZLIB_INCLUDE_DIRS "${zlib_SOURCE_DIR}" CACHE STRING "" FORCE)
+
 if(NOT TARGET ZLIB::ZLIB)
-    add_library(ZLIB::ZLIB ALIAS ${BLURBO_ZLIB_TARGET})
+    add_library(ZLIB::ZLIB INTERFACE IMPORTED GLOBAL)
+    set_target_properties(ZLIB::ZLIB PROPERTIES
+        INTERFACE_LINK_LIBRARIES "${BLURBO_ZLIB_TARGET}"
+        INTERFACE_INCLUDE_DIRECTORIES "${zlib_SOURCE_DIR};${zlib_BINARY_DIR}"
+    )
 endif()
 
 
@@ -124,6 +136,7 @@ FetchContent_Declare(
     SOURCE_SUBDIR  "__download_only__"
 )
 
+
 FetchContent_Declare(
     SDL3
     GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git"
@@ -135,7 +148,7 @@ set(SDL_TEST_LIBRARY OFF CACHE BOOL "" FORCE)
 set(SDL_TESTS OFF CACHE BOOL "" FORCE)
 set(SDL_EXAMPLES OFF CACHE BOOL "" FORCE)
 
-# Don't use SDL_image's vendored libs (they clash with our zlib); use stb backends
+
 set(SDLIMAGE_VENDORED OFF CACHE BOOL "" FORCE)
 set(SDLIMAGE_DEPS_SHARED ON CACHE BOOL "" FORCE)
 set(SDLIMAGE_AVIF OFF CACHE BOOL "" FORCE)
@@ -315,11 +328,11 @@ glad_add_library(GLAD SHARED REPRODUCIBLE API gl:compatibility=4.6)
 set(BLURBO_PROJECTS blurbo_utilities blurbo_window blurbo_editor)
 
 foreach(BLURBO_PROJ IN LISTS BLURBO_PROJECTS)
-    set(BLURBO_PROJ_DIR "CMAKECURRENTSOURCEDIR/{BLURBO_PROJ}")
+    set(BLURBO_PROJ_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${BLURBO_PROJ}")
 
     foreach(BLURBO_SUBDIR src include)
-        if(NOT EXISTS "BLURBOPROJDIR/{BLURBO_SUBDIR}")
-            file(MAKE_DIRECTORY "BLURBOPROJDIR/{BLURBO_SUBDIR}")
+        if(NOT EXISTS "${BLURBO_PROJ_DIR}/${BLURBO_SUBDIR}")
+            file(MAKE_DIRECTORY "${BLURBO_PROJ_DIR}/${BLURBO_SUBDIR}")
         endif()
     endforeach()
 
@@ -337,7 +350,7 @@ int main(int argc, char** argv)
 }
 ]=])
         else()
-            file(WRITE "BLURBOPROJDIR/src/{BLURBO_PROJ}.cpp"
+            file(WRITE "${BLURBO_PROJ_DIR}/src/${BLURBO_PROJ}.cpp"
                 "void ${BLURBO_PROJ}_placeholder() {}\n")
         endif()
     endif()
@@ -442,4 +455,3 @@ target_link_libraries(blurbo_editor PRIVATE
 )
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT blurbo_editor)
-
