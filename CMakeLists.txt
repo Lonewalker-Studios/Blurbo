@@ -140,9 +140,13 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(SDL3 SDL3_image box2d entt lua sol2 glm fmt zlib)
 
-set(ZLIB_FOUND TRUE CACHE BOOL "" FORCE)
-set(ZLIB_LIBRARIES zlibstatic CACHE STRING "" FORCE)
-set(ZLIB_INCLUDE_DIRS "${zlib_SOURCE_DIR};${zlib_BINARY_DIR}" CACHE STRING "" FORCE)
+if(TARGET zlibstatic)
+    add_library(ZLIB::ZLIB ALIAS zlibstatic)
+    set(ZLIB_FOUND TRUE CACHE BOOL "" FORCE)
+    set(ZLIB_LIBRARIES zlibstatic CACHE STRING "" FORCE)
+    set(ZLIB_INCLUDE_DIRS "${zlib_SOURCE_DIR};${zlib_BINARY_DIR}" CACHE STRING "" FORCE)
+    set(ZLIB_VERSION_STRING "1.3.1" CACHE STRING "" FORCE)
+endif()
 
 FetchContent_MakeAvailable(libzip libzippp tinyxml2)
 
