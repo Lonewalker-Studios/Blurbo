@@ -12,10 +12,8 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(FETCHCONTENT_QUIET OFF CACHE BOOL "" FORCE)
 
-# Build everything as shared libraries
 set(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-# Windows: export all symbols from our own DLLs without __declspec annotations
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 include(FetchContent)
@@ -31,7 +29,6 @@ set(SDL_TEST_LIBRARY OFF CACHE BOOL "" FORCE)
 set(SDL_TESTS OFF CACHE BOOL "" FORCE)
 set(SDL_EXAMPLES OFF CACHE BOOL "" FORCE)
 
-
 FetchContent_Declare(
     SDL3_image
     GIT_REPOSITORY "https://github.com/libsdl-org/SDL_image.git"
@@ -39,7 +36,6 @@ FetchContent_Declare(
 )
 set(SDLIMAGE_SAMPLES OFF CACHE BOOL "" FORCE)
 set(SDLIMAGE_TESTS OFF CACHE BOOL "" FORCE)
-
 
 FetchContent_Declare(
     box2d
@@ -51,13 +47,11 @@ set(BOX2D_BENCHMARKS OFF CACHE INTERNAL "")
 set(BOX2D_DOCS OFF CACHE INTERNAL "")
 set(BOX2D_UNIT_TESTS OFF CACHE INTERNAL "")
 
-# 4. EnTT
 FetchContent_Declare(
     entt
     GIT_REPOSITORY "https://github.com/skypjack/entt.git"
     GIT_TAG        "v4.0.0"
 )
-
 
 FetchContent_Declare(
     lua
@@ -66,14 +60,12 @@ FetchContent_Declare(
     SOURCE_SUBDIR  "__download_only__"
 )
 
-
 FetchContent_Declare(
     sol2
     GIT_REPOSITORY "https://github.com/ThePhD/sol2.git"
     GIT_TAG        "v3.5.0"
     SOURCE_SUBDIR  "__download_only__"
 )
-
 
 FetchContent_Declare(
     glm
@@ -82,20 +74,18 @@ FetchContent_Declare(
     SOURCE_SUBDIR  "__download_only__"
 )
 
-
 FetchContent_Declare(
     fmt
     GIT_REPOSITORY "https://github.com/fmtlib/fmt.git"
     GIT_TAG        "10.2.1"
 )
 
-
 FetchContent_Declare(
     soil2
     GIT_REPOSITORY "https://github.com/SpartanJ/SOIL2.git"
     GIT_TAG        "master"
+    SOURCE_SUBDIR  "__download_only__"
 )
-
 
 FetchContent_Declare(
     stb
@@ -104,14 +94,12 @@ FetchContent_Declare(
     SOURCE_SUBDIR  "__download_only__"
 )
 
-
 FetchContent_Declare(
     tinyfiledialogs
     GIT_REPOSITORY "https://github.com/native-toolkit/tinyfiledialogs.git"
     GIT_TAG        "master"
     SOURCE_SUBDIR  "__download_only__"
 )
-
 
 FetchContent_Declare(
     rapidjson
@@ -120,6 +108,12 @@ FetchContent_Declare(
     SOURCE_SUBDIR  "__download_only__"
 )
 
+FetchContent_Declare(
+    zlib
+    GIT_REPOSITORY "https://github.com/madler/zlib.git"
+    GIT_TAG        "v1.3.1"
+)
+set(ZLIB_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 FetchContent_Declare(
     libzip
@@ -138,17 +132,19 @@ FetchContent_Declare(
 )
 set(LIBZIPPP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 
-
 FetchContent_Declare(
     tinyxml2
     GIT_REPOSITORY "https://github.com/leethomason/tinyxml2.git"
     GIT_TAG        "10.0.0"
 )
 
+FetchContent_MakeAvailable(SDL3 SDL3_image box2d entt lua sol2 glm fmt zlib)
 
+set(ZLIB_FOUND TRUE CACHE BOOL "" FORCE)
+set(ZLIB_LIBRARIES zlibstatic CACHE STRING "" FORCE)
+set(ZLIB_INCLUDE_DIRS "${zlib_SOURCE_DIR};${zlib_BINARY_DIR}" CACHE STRING "" FORCE)
 
-FetchContent_MakeAvailable(SDL3 SDL3_image box2d entt lua sol2 glm fmt soil2 libzip libzippp tinyxml2)
-
+FetchContent_MakeAvailable(libzip libzippp tinyxml2)
 
 file(GLOB LUA_SOURCES "${lua_SOURCE_DIR}/*.c")
 list(FILTER LUA_SOURCES EXCLUDE REGEX ".*/(lua|luac|onelua|ltests)\\.c$")
@@ -163,15 +159,21 @@ if(UNIX)
     target_link_libraries(lua PUBLIC m ${CMAKE_DL_LIBS})
 endif()
 
-
 add_library(sol2 INTERFACE)
 target_include_directories(sol2 INTERFACE ${sol2_SOURCE_DIR}/include)
 target_link_libraries(sol2 INTERFACE lua)
 target_compile_definitions(sol2 INTERFACE SOL_ALL_SAFETIES_ON=1)
 
-
 add_library(glm INTERFACE)
 target_include_directories(glm INTERFACE ${glm_SOURCE_DIR})
+
+FetchContent_GetProperties(soil2)
+if(NOT soil2_POPULATED)
+    FetchContent_Populate(soil2)
+    file(GLOB SOIL2_SOURCES "${soil2_SOURCE_DIR}/src/SOIL2/*.c")
+    add_library(soil2 SHARED ${SOIL2_SOURCES})
+    target_include_directories(soil2 PUBLIC ${soil2_SOURCE_DIR}/src/SOIL2)
+endif()
 
 FetchContent_GetProperties(stb)
 if(NOT stb_POPULATED)
@@ -180,20 +182,19 @@ if(NOT stb_POPULATED)
     target_include_directories(stb INTERFACE ${stb_SOURCE_DIR})
 endif()
 
-
 FetchContent_GetProperties(tinyfiledialogs)
 if(NOT tinyfiledialogs_POPULATED)
     FetchContent_Populate(tinyfiledialogs)
-    add_library(tinyfiledialogs STATIC ${tinyfiledialogs_SOURCE_DIR}/tinyfiledialogs.c)
+    add_library(tinyfiledialogs OBJECT ${tinyfiledialogs_SOURCE_DIR}/tinyfiledialogs.c)
     target_include_directories(tinyfiledialogs PUBLIC ${tinyfiledialogs_SOURCE_DIR})
 endif()
+
 FetchContent_GetProperties(rapidjson)
 if(NOT rapidjson_POPULATED)
     FetchContent_Populate(rapidjson)
     add_library(rapidjson INTERFACE)
     target_include_directories(rapidjson INTERFACE ${rapidjson_SOURCE_DIR}/include)
 endif()
-
 
 FetchContent_Declare(
     glad
@@ -205,15 +206,14 @@ FetchContent_MakeAvailable(glad)
 
 find_package(OpenGL REQUIRED)
 
-
 set(BLURBO_PROJECTS blurbo_utilities blurbo_window blurbo_editor)
 
 foreach(BLURBO_PROJ IN LISTS BLURBO_PROJECTS)
-    set(BLURBO_PROJ_DIR "CMAKECURRENTSOURCEDIR/{BLURBO_PROJ}")
+    set(BLURBO_PROJ_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${BLURBO_PROJ}")
 
     foreach(BLURBO_SUBDIR src include)
-        if(NOT EXISTS "BLURBOPROJDIR/{BLURBO_SUBDIR}")
-            file(MAKE_DIRECTORY "BLURBOPROJDIR/{BLURBO_SUBDIR}")
+        if(NOT EXISTS "${BLURBO_PROJ_DIR}/${BLURBO_SUBDIR}")
+            file(MAKE_DIRECTORY "${BLURBO_PROJ_DIR}/${BLURBO_SUBDIR}")
         endif()
     endforeach()
 
@@ -227,12 +227,11 @@ foreach(BLURBO_PROJ IN LISTS BLURBO_PROJECTS)
             file(WRITE "${BLURBO_PROJ_DIR}/src/main.cpp" [=[
 int main(int argc, char** argv)
 {
-    // code here
     return 0;
 }
 ]=])
         else()
-            file(WRITE "BLURBOPROJDIR/src/{BLURBO_PROJ}.cpp"
+            file(WRITE "${BLURBO_PROJ_DIR}/src/${BLURBO_PROJ}.cpp"
                 "void ${BLURBO_PROJ}_placeholder() {}\n")
         endif()
     endif()
@@ -240,9 +239,6 @@ endforeach()
 
 glad_add_library(GLAD SHARED REPRODUCIBLE API gl:compatibility=4.6)
 
-
-
-# blurbo_utilities
 file(GLOB_RECURSE BLURBO_UTILITIES_SOURCES CONFIGURE_DEPENDS
     "blurbo_utilities/src/*.cpp"
     "blurbo_utilities/src/*.hpp"
@@ -274,7 +270,6 @@ target_link_libraries(blurbo_utilities PUBLIC
     tinyxml2::tinyxml2
 )
 
-
 file(GLOB_RECURSE BLURBO_WINDOW_SOURCES CONFIGURE_DEPENDS
     "blurbo_window/src/*.cpp"
     "blurbo_window/src/*.hpp"
@@ -297,7 +292,6 @@ target_link_libraries(blurbo_window PUBLIC
     SDL3::SDL3
     SDL3_image::SDL3_image
 )
-
 
 file(GLOB_RECURSE BLURBO_EDITOR_SOURCES CONFIGURE_DEPENDS
     "blurbo_editor/src/*.cpp"
@@ -334,7 +328,6 @@ target_link_libraries(blurbo_editor PRIVATE
     tinyxml2::tinyxml2
 )
 
-
 if(WIN32)
     add_custom_command(
         TARGET blurbo_editor POST_BUILD
@@ -346,4 +339,3 @@ if(WIN32)
 endif()
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT blurbo_editor)
-
