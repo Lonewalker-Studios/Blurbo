@@ -36,7 +36,6 @@ set(LIBUSB_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(zlib libusb)
 
-
 if(TARGET zlib)
     set(ZLIB_FOUND TRUE CACHE BOOL "" FORCE)
     set(ZLIB_LIBRARY zlib CACHE STRING "" FORCE)
@@ -168,12 +167,26 @@ set(BUILD_REGRESS OFF CACHE BOOL "" FORCE)
 set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(BUILD_DOC OFF CACHE BOOL "" FORCE)
 
+FetchContent_MakeAvailable(libzip)
+
+
+set(LIBZIP_FOUND TRUE CACHE BOOL "" FORCE)
+set(LIBZIP_LIBRARIES zip CACHE STRING "" FORCE)
+set(LIBZIP_INCLUDE_DIRS "libzipSOURCEDIR/lib;{libzip_BINARY_DIR}" CACHE STRING "" FORCE)
+set(LIBZIP_LIBRARY zip CACHE STRING "" FORCE)
+set(LIBZIP_INCLUDE_DIR "libzipSOURCEDIR/lib;{libzip_BINARY_DIR}" CACHE STRING "" FORCE)
+
+if(NOT TARGET libzip::zip)
+    add_library(libzip::zip ALIAS zip)
+endif()
+
 FetchContent_Declare(
     libzippp
     GIT_REPOSITORY "https://github.com/ctrabant/libzippp.git"
     GIT_TAG        "libzippp-v1.0.1-1.10.1"
 )
 set(LIBZIPPP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(LIBZIPPP_INSTALL OFF CACHE BOOL "" FORCE)
 
 FetchContent_Declare(
     tinyxml2
@@ -181,7 +194,7 @@ FetchContent_Declare(
     GIT_TAG        "10.0.0"
 )
 
-FetchContent_MakeAvailable(SDL3 SDL3_image box2d entt lua sol2 glm fmt libzip libzippp tinyxml2)
+FetchContent_MakeAvailable(SDL3 SDL3_image box2d entt lua sol2 glm fmt libzippp tinyxml2)
 
 
 file(GLOB LUA_SOURCES "${lua_SOURCE_DIR}/*.c")
@@ -278,7 +291,7 @@ endforeach()
 
 glad_add_library(GLAD SHARED REPRODUCIBLE API gl:compatibility=4.6)
 
-# blurbo_utilities
+
 file(GLOB_RECURSE BLURBO_UTILITIES_SOURCES CONFIGURE_DEPENDS
     "blurbo_utilities/src/*.cpp"
     "blurbo_utilities/src/*.hpp"
@@ -312,7 +325,7 @@ target_link_libraries(blurbo_utilities PUBLIC
     LibUSB::LibUSB
 )
 
-# blurbo_window
+
 file(GLOB_RECURSE BLURBO_WINDOW_SOURCES CONFIGURE_DEPENDS
     "blurbo_window/src/*.cpp"
     "blurbo_window/src/*.hpp"
@@ -338,7 +351,7 @@ target_link_libraries(blurbo_window PUBLIC
     LibUSB::LibUSB
 )
 
-# blurbo_editor
+
 file(GLOB_RECURSE BLURBO_EDITOR_SOURCES CONFIGURE_DEPENDS
     "blurbo_editor/src/*.cpp"
     "blurbo_editor/src/*.hpp"
