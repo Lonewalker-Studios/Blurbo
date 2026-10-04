@@ -1,4 +1,3 @@
-
 cmake_minimum_required(VERSION 3.28)
 
 get_filename_component(PARENT_DIR "${CMAKE_CURRENT_SOURCE_DIR}" NAME)
@@ -20,6 +19,21 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 include(FetchContent)
 
 FetchContent_Declare(
+    zlib
+    GIT_REPOSITORY "https://github.com/madler/zlib.git"
+    GIT_TAG        "v1.3.1"
+)
+set(ZLIB_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+
+FetchContent_Declare(
+    libusb
+    GIT_REPOSITORY "https://github.com/libusb/libusb.git"
+    GIT_TAG        "v1.0.27"
+)
+set(LIBUSB_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(LIBUSB_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+
+FetchContent_Declare(
     SDL3
     GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git"
     GIT_TAG        "release-3.4.14"
@@ -37,6 +51,8 @@ FetchContent_Declare(
 )
 set(SDLIMAGE_SAMPLES OFF CACHE BOOL "" FORCE)
 set(SDLIMAGE_TESTS OFF CACHE BOOL "" FORCE)
+set(SDLIMAGE_VENDORED ON CACHE BOOL "" FORCE)
+set(SDLIMAGE_DEPS_SHARED ON CACHE BOOL "" FORCE)
 
 FetchContent_Declare(
     box2d
@@ -110,13 +126,6 @@ FetchContent_Declare(
 )
 
 FetchContent_Declare(
-    zlib
-    GIT_REPOSITORY "https://github.com/madler/zlib.git"
-    GIT_TAG        "v1.3.1"
-)
-set(ZLIB_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-
-FetchContent_Declare(
     libzip
     GIT_REPOSITORY "https://github.com/nih-at/libzip.git"
     GIT_TAG        "v1.10.1"
@@ -139,14 +148,26 @@ FetchContent_Declare(
     GIT_TAG        "10.0.0"
 )
 
-FetchContent_MakeAvailable(SDL3 SDL3_image box2d entt lua sol2 glm fmt zlib)
+FetchContent_MakeAvailable(zlib libusb SDL3 SDL3_image box2d entt lua sol2 glm fmt)
 
-if(TARGET zlibstatic)
+if(TARGET zlib AND NOT TARGET ZLIB::ZLIB)
+    add_library(ZLIB::ZLIB ALIAS zlib)
+    set(ZLIB_FOUND TRUE CACHE BOOL "" FORCE)
+    set(ZLIB_LIBRARIES zlib CACHE STRING "" FORCE)
+    set(ZLIB_INCLUDE_DIRS "zlibSOURCEDIR;{zlib_BINARY_DIR}" CACHE STRING "" FORCE)
+    set(ZLIB_VERSION_STRING "1.3.1" CACHE STRING "" FORCE)
+elseif(TARGET zlibstatic AND NOT TARGET ZLIB::ZLIB)
     add_library(ZLIB::ZLIB ALIAS zlibstatic)
     set(ZLIB_FOUND TRUE CACHE BOOL "" FORCE)
     set(ZLIB_LIBRARIES zlibstatic CACHE STRING "" FORCE)
     set(ZLIB_INCLUDE_DIRS "zlibSOURCEDIR;{zlib_BINARY_DIR}" CACHE STRING "" FORCE)
     set(ZLIB_VERSION_STRING "1.3.1" CACHE STRING "" FORCE)
+endif()
+
+if(TARGET usb-1.0 AND NOT TARGET LibUSB::LibUSB)
+    add_library(LibUSB::LibUSB ALIAS usb-1.0)
+    set(LibUSB_FOUND TRUE CACHE BOOL "" FORCE)
+    set(LIBUSB_FOUND TRUE CACHE BOOL "" FORCE)
 endif()
 
 FetchContent_MakeAvailable(libzip libzippp tinyxml2)
@@ -273,6 +294,8 @@ target_link_libraries(blurbo_utilities PUBLIC
     rapidjson
     libzippp::libzippp
     tinyxml2::tinyxml2
+    ZLIB::ZLIB
+    LibUSB::LibUSB
 )
 
 file(GLOB_RECURSE BLURBO_WINDOW_SOURCES CONFIGURE_DEPENDS
@@ -296,6 +319,8 @@ target_link_libraries(blurbo_window PUBLIC
     GLAD
     SDL3::SDL3
     SDL3_image::SDL3_image
+    ZLIB::ZLIB
+    LibUSB::LibUSB
 )
 
 file(GLOB_RECURSE BLURBO_EDITOR_SOURCES CONFIGURE_DEPENDS
@@ -331,6 +356,8 @@ target_link_libraries(blurbo_editor PRIVATE
     rapidjson
     libzippp::libzippp
     tinyxml2::tinyxml2
+    ZLIB::ZLIB
+    LibUSB::LibUSB
 )
 
 if(WIN32)
@@ -344,5 +371,4 @@ if(WIN32)
 endif()
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT blurbo_editor)
-
 
