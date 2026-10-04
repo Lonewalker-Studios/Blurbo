@@ -1,3 +1,4 @@
+
 cmake_minimum_required(VERSION 3.28)
 
 get_filename_component(PARENT_DIR "${CMAKE_CURRENT_SOURCE_DIR}" NAME)
@@ -109,6 +110,13 @@ FetchContent_Declare(
 )
 
 FetchContent_Declare(
+    zlib
+    GIT_REPOSITORY "https://github.com/madler/zlib.git"
+    GIT_TAG        "v1.3.1"
+)
+set(ZLIB_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+
+FetchContent_Declare(
     libzip
     GIT_REPOSITORY "https://github.com/nih-at/libzip.git"
     GIT_TAG        "v1.10.1"
@@ -131,19 +139,13 @@ FetchContent_Declare(
     GIT_TAG        "10.0.0"
 )
 
-FetchContent_MakeAvailable(SDL3 SDL3_image box2d entt lua sol2 glm fmt)
+FetchContent_MakeAvailable(SDL3 SDL3_image box2d entt lua sol2 glm fmt zlib)
 
-if(TARGET zlibstatic AND NOT TARGET ZLIB::ZLIB)
+if(TARGET zlibstatic)
     add_library(ZLIB::ZLIB ALIAS zlibstatic)
     set(ZLIB_FOUND TRUE CACHE BOOL "" FORCE)
     set(ZLIB_LIBRARIES zlibstatic CACHE STRING "" FORCE)
-    set(ZLIB_INCLUDE_DIRS "sdl3imageSOURCEDIR/external/zlib;{sdl3_image_BINARY_DIR}/external/zlib" CACHE STRING "" FORCE)
-    set(ZLIB_VERSION_STRING "1.3.1" CACHE STRING "" FORCE)
-elseif(TARGET zlib AND NOT TARGET ZLIB::ZLIB)
-    add_library(ZLIB::ZLIB ALIAS zlib)
-    set(ZLIB_FOUND TRUE CACHE BOOL "" FORCE)
-    set(ZLIB_LIBRARIES zlib CACHE STRING "" FORCE)
-    set(ZLIB_INCLUDE_DIRS "sdl3imageSOURCEDIR/external/zlib;{sdl3_image_BINARY_DIR}/external/zlib" CACHE STRING "" FORCE)
+    set(ZLIB_INCLUDE_DIRS "zlibSOURCEDIR;{zlib_BINARY_DIR}" CACHE STRING "" FORCE)
     set(ZLIB_VERSION_STRING "1.3.1" CACHE STRING "" FORCE)
 endif()
 
@@ -342,4 +344,5 @@ if(WIN32)
 endif()
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT blurbo_editor)
+
 
