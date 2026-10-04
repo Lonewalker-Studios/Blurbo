@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.28)
 
-
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 
 get_filename_component(PARENT_DIR "${CMAKE_CURRENT_SOURCE_DIR}" NAME)
@@ -17,20 +16,16 @@ set(FETCHCONTENT_QUIET OFF CACHE BOOL "" FORCE)
 
 set(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
-# Put the exe and every DLL in the same folder (build/bin/<Config>)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 
 include(FetchContent)
 
-
 if(POLICY CMP0169)
     cmake_policy(SET CMP0169 OLD)
 endif()
-
 
 FetchContent_Declare(
     zlib
@@ -38,7 +33,6 @@ FetchContent_Declare(
     GIT_TAG        "v1.3.1"
 )
 set(ZLIB_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-
 
 FetchContent_Declare(
     libusb
@@ -55,7 +49,6 @@ elseif(TARGET zlibstatic)
     set(BLURBO_ZLIB_TARGET zlibstatic)
 endif()
 
-
 target_include_directories(${BLURBO_ZLIB_TARGET} INTERFACE
     "${zlib_SOURCE_DIR}"
     "${zlib_BINARY_DIR}"
@@ -66,15 +59,13 @@ set(ZLIB_LIBRARY ${BLURBO_ZLIB_TARGET} CACHE STRING "" FORCE)
 set(ZLIB_LIBRARIES ${BLURBO_ZLIB_TARGET} CACHE STRING "" FORCE)
 set(ZLIB_INCLUDE_DIR "${zlib_SOURCE_DIR}" CACHE STRING "" FORCE)
 set(ZLIB_INCLUDE_DIRS "${zlib_SOURCE_DIR}" CACHE STRING "" FORCE)
-
 if(NOT TARGET ZLIB::ZLIB)
     add_library(ZLIB::ZLIB INTERFACE IMPORTED GLOBAL)
     set_target_properties(ZLIB::ZLIB PROPERTIES
         INTERFACE_LINK_LIBRARIES "${BLURBO_ZLIB_TARGET}"
-        INTERFACE_INCLUDE_DIRECTORIES "${zlib_SOURCE_DIR};${zlib_BINARY_DIR}"
+        INTERFACE_INCLUDE_DIRECTORIES "zlibSOURCEDIR;{zlib_BINARY_DIR}"
     )
 endif()
-
 
 if(WIN32)
     add_library(usb-1.0 STATIC
@@ -104,7 +95,6 @@ else()
     add_library(LibUSB::LibUSB ALIAS PkgConfig::LIBUSB)
 endif()
 
-
 FetchContent_Declare(
     libzip
     GIT_REPOSITORY "https://github.com/nih-at/libzip.git"
@@ -128,14 +118,12 @@ if(NOT TARGET libzip::zip)
     add_library(libzip::zip ALIAS zip)
 endif()
 
-
 FetchContent_Declare(
     libzippp
     GIT_REPOSITORY "https://github.com/ctabin/libzippp.git"
     GIT_TAG        "master"
     SOURCE_SUBDIR  "__download_only__"
 )
-
 
 FetchContent_Declare(
     SDL3
@@ -147,7 +135,6 @@ set(SDL_STATIC OFF CACHE BOOL "" FORCE)
 set(SDL_TEST_LIBRARY OFF CACHE BOOL "" FORCE)
 set(SDL_TESTS OFF CACHE BOOL "" FORCE)
 set(SDL_EXAMPLES OFF CACHE BOOL "" FORCE)
-
 
 set(SDLIMAGE_VENDORED OFF CACHE BOOL "" FORCE)
 set(SDLIMAGE_DEPS_SHARED ON CACHE BOOL "" FORCE)
@@ -162,9 +149,8 @@ FetchContent_Declare(
     SDL3_image
     GIT_REPOSITORY "https://github.com/libsdl-org/SDL_image.git"
     GIT_TAG        "main"
-    GIT_SUBMODULES ""   # skip the huge vendored submodules
+    GIT_SUBMODULES ""
 )
-
 
 FetchContent_Declare(
     box2d
@@ -252,12 +238,10 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(libzippp SDL3 SDL3_image box2d entt lua sol2 glm fmt tinyxml2 glad)
 
-
 add_library(libzippp STATIC ${libzippp_SOURCE_DIR}/src/libzippp.cpp)
 target_include_directories(libzippp PUBLIC ${libzippp_SOURCE_DIR}/src)
 target_link_libraries(libzippp PUBLIC libzip::zip ZLIB::ZLIB)
 add_library(libzippp::libzippp ALIAS libzippp)
-
 
 file(GLOB LUA_SOURCES "${lua_SOURCE_DIR}/*.c")
 list(FILTER LUA_SOURCES EXCLUDE REGEX ".*/(lua|luac|onelua|ltests)\\.c$")
@@ -266,13 +250,11 @@ add_library(lua SHARED ${LUA_SOURCES})
 target_include_directories(lua PUBLIC ${lua_SOURCE_DIR})
 if(WIN32)
     target_compile_definitions(lua PUBLIC LUA_BUILD_AS_DLL)
-    target_compile_definitions(lua PRIVATE LUA_LIB)
 endif()
 if(UNIX)
     target_compile_definitions(lua PRIVATE LUA_USE_POSIX)
     target_link_libraries(lua PUBLIC m ${CMAKE_DL_LIBS})
 endif()
-
 
 add_library(sol2 INTERFACE)
 target_include_directories(sol2 INTERFACE ${sol2_SOURCE_DIR}/include)
@@ -284,16 +266,15 @@ target_include_directories(glm INTERFACE ${glm_SOURCE_DIR})
 
 find_package(OpenGL REQUIRED)
 
-
 FetchContent_GetProperties(soil2)
 if(NOT soil2_POPULATED)
     FetchContent_Populate(soil2)
 endif()
 file(GLOB SOIL2_SOURCES "${soil2_SOURCE_DIR}/src/SOIL2/*.c")
 add_library(soil2 SHARED ${SOIL2_SOURCES})
+set_target_properties(soil2 PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
 target_include_directories(soil2 PUBLIC ${soil2_SOURCE_DIR}/src/SOIL2)
 target_link_libraries(soil2 PUBLIC OpenGL::GL)
-
 
 FetchContent_GetProperties(stb)
 if(NOT stb_POPULATED)
@@ -301,7 +282,6 @@ if(NOT stb_POPULATED)
 endif()
 add_library(stb INTERFACE)
 target_include_directories(stb INTERFACE ${stb_SOURCE_DIR})
-
 
 FetchContent_GetProperties(tinyfiledialogs)
 if(NOT tinyfiledialogs_POPULATED)
@@ -313,7 +293,6 @@ if(WIN32)
     target_link_libraries(tinyfiledialogs PUBLIC comdlg32 ole32 user32 shell32)
 endif()
 
-
 FetchContent_GetProperties(rapidjson)
 if(NOT rapidjson_POPULATED)
     FetchContent_Populate(rapidjson)
@@ -321,18 +300,16 @@ endif()
 add_library(rapidjson INTERFACE)
 target_include_directories(rapidjson INTERFACE ${rapidjson_SOURCE_DIR}/include)
 
-
 glad_add_library(GLAD SHARED REPRODUCIBLE API gl:compatibility=4.6)
-
 
 set(BLURBO_PROJECTS blurbo_utilities blurbo_window blurbo_editor)
 
 foreach(BLURBO_PROJ IN LISTS BLURBO_PROJECTS)
-    set(BLURBO_PROJ_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${BLURBO_PROJ}")
+    set(BLURBO_PROJ_DIR "CMAKECURRENTSOURCEDIR/{BLURBO_PROJ}")
 
     foreach(BLURBO_SUBDIR src include)
-        if(NOT EXISTS "${BLURBO_PROJ_DIR}/${BLURBO_SUBDIR}")
-            file(MAKE_DIRECTORY "${BLURBO_PROJ_DIR}/${BLURBO_SUBDIR}")
+        if(NOT EXISTS "BLURBOPROJDIR/{BLURBO_SUBDIR}")
+            file(MAKE_DIRECTORY "BLURBOPROJDIR/{BLURBO_SUBDIR}")
         endif()
     endforeach()
 
@@ -350,12 +327,11 @@ int main(int argc, char** argv)
 }
 ]=])
         else()
-            file(WRITE "${BLURBO_PROJ_DIR}/src/${BLURBO_PROJ}.cpp"
+            file(WRITE "BLURBOPROJDIR/src/{BLURBO_PROJ}.cpp"
                 "void ${BLURBO_PROJ}_placeholder() {}\n")
         endif()
     endif()
 endforeach()
-
 
 file(GLOB_RECURSE BLURBO_UTILITIES_SOURCES CONFIGURE_DEPENDS
     "blurbo_utilities/src/*.cpp"
@@ -367,6 +343,7 @@ file(GLOB_RECURSE BLURBO_UTILITIES_SOURCES CONFIGURE_DEPENDS
 )
 
 add_library(blurbo_utilities SHARED ${BLURBO_UTILITIES_SOURCES})
+set_target_properties(blurbo_utilities PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 target_include_directories(blurbo_utilities PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/blurbo_utilities/include
@@ -390,7 +367,6 @@ target_link_libraries(blurbo_utilities PUBLIC
     LibUSB::LibUSB
 )
 
-
 file(GLOB_RECURSE BLURBO_WINDOW_SOURCES CONFIGURE_DEPENDS
     "blurbo_window/src/*.cpp"
     "blurbo_window/src/*.hpp"
@@ -401,6 +377,7 @@ file(GLOB_RECURSE BLURBO_WINDOW_SOURCES CONFIGURE_DEPENDS
 )
 
 add_library(blurbo_window SHARED ${BLURBO_WINDOW_SOURCES})
+set_target_properties(blurbo_window PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 target_include_directories(blurbo_window PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/blurbo_window/include
@@ -415,7 +392,6 @@ target_link_libraries(blurbo_window PUBLIC
     ZLIB::ZLIB
     LibUSB::LibUSB
 )
-
 
 file(GLOB_RECURSE BLURBO_EDITOR_SOURCES CONFIGURE_DEPENDS
     "blurbo_editor/src/*.cpp"
@@ -455,3 +431,4 @@ target_link_libraries(blurbo_editor PRIVATE
 )
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT blurbo_editor)
+
