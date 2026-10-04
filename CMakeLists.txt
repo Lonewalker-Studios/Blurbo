@@ -19,13 +19,6 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 include(FetchContent)
 
 FetchContent_Declare(
-    zlib
-    GIT_REPOSITORY "https://github.com/madler/zlib.git"
-    GIT_TAG        "v1.3.1"
-)
-set(ZLIB_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-
-FetchContent_Declare(
     SDL3
     GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git"
     GIT_TAG        "release-3.4.14"
@@ -138,19 +131,19 @@ FetchContent_Declare(
     GIT_TAG        "10.0.0"
 )
 
-FetchContent_MakeAvailable(zlib SDL3 SDL3_image box2d entt lua sol2 glm fmt)
+FetchContent_MakeAvailable(SDL3 SDL3_image box2d entt lua sol2 glm fmt)
 
 if(TARGET zlibstatic AND NOT TARGET ZLIB::ZLIB)
     add_library(ZLIB::ZLIB ALIAS zlibstatic)
     set(ZLIB_FOUND TRUE CACHE BOOL "" FORCE)
     set(ZLIB_LIBRARIES zlibstatic CACHE STRING "" FORCE)
-    set(ZLIB_INCLUDE_DIRS "zlibSOURCEDIR;{zlib_BINARY_DIR}" CACHE STRING "" FORCE)
+    set(ZLIB_INCLUDE_DIRS "sdl3imageSOURCEDIR/external/zlib;{sdl3_image_BINARY_DIR}/external/zlib" CACHE STRING "" FORCE)
     set(ZLIB_VERSION_STRING "1.3.1" CACHE STRING "" FORCE)
 elseif(TARGET zlib AND NOT TARGET ZLIB::ZLIB)
     add_library(ZLIB::ZLIB ALIAS zlib)
     set(ZLIB_FOUND TRUE CACHE BOOL "" FORCE)
     set(ZLIB_LIBRARIES zlib CACHE STRING "" FORCE)
-    set(ZLIB_INCLUDE_DIRS "zlibSOURCEDIR;{zlib_BINARY_DIR}" CACHE STRING "" FORCE)
+    set(ZLIB_INCLUDE_DIRS "sdl3imageSOURCEDIR/external/zlib;{sdl3_image_BINARY_DIR}/external/zlib" CACHE STRING "" FORCE)
     set(ZLIB_VERSION_STRING "1.3.1" CACHE STRING "" FORCE)
 endif()
 
