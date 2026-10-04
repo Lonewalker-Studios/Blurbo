@@ -1,4 +1,4 @@
-#include <glad/gl.h>        
+#include <glad/gl.h>
 #include <SDL3/SDL.h>
 #include <Window.h>
 #include <string>
@@ -8,22 +8,27 @@ void reportError() {
 	std::string error = SDL_GetError();
 	std::cout << "Error! " + error << std::endl;
 }
-void reportShaderError(GLuint shader) {
-	int status;
-	if (!status) {
-		char infoLog[512];
-		glGetShaderInfoLog(shader, 512, NULL, infoLog);
-		std::cout << "Error! " << infoLog << std::endl;
+
+void checkShader(GLuint shader, const char* name) {
+	int ok = 0;
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &ok);
+	if (!ok) {
+		char log[512];
+		glGetShaderInfoLog(shader, 512, nullptr, log);
+		std::cout << name << " shader error: " << log << std::endl;
 	}
 }
-void reportSPError(GLuint program) {
-	int status;
-	if (!status) {
-		char infoLog[512];
-		glGetProgramInfoLog(program, 512, NULL, infoLog);
-		std::cout << "Error! " << infoLog << std::endl;
+
+void checkProgram(GLuint program) {
+	int ok = 0;
+	glGetProgramiv(program, GL_LINK_STATUS, &ok);
+	if (!ok) {
+		char log[512];
+		glGetProgramInfoLog(program, 512, nullptr, log);
+		std::cout << "Program link error: " << log << std::endl;
 	}
 }
+
 int width = 800;
 int height = 600;
 std::string title = "Blurbo";
@@ -32,13 +37,12 @@ int main() {
 	bool running{ true };
 	SDL_InitFlags sdlFlags = SDL_INIT_VIDEO | SDL_INIT_AUDIO;
 
-
 	if (!SDL_Init(sdlFlags)) {
 		reportError();
 		return 1;
 	}
 
-	// Setup OpenGL 
+	// Setup OpenGL
 	if (!SDL_GL_LoadLibrary(NULL)) {
 		reportError();
 		return 1;
@@ -76,77 +80,69 @@ int main() {
 	SDL_GL_MakeCurrent(window.getWindow().get(), window.getGLContext());
 	SDL_GL_SetSwapInterval(1);
 
-	// Initialize GLAD 
+	// Initialize GLAD
 	if (gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress) == 0) {
 		reportError();
 		return 1;
 	}
+
 	// Temporary vertex data
 	float vertices[] = {
-		0.0f, 0.5f, 0.f, // 1 vertex
-		-0.5f, -0.5f, 0.f,
-		0.5f, -0.5f, 0.f
+		 0.0f,  0.5f, 0.0f,
+		-0.5f, -0.5f, 0.0f,
+		 0.5f, -0.5f, 0.0f
 	};
 
-	// Temporary vertex source
+	// Temporary shader code (vertex and fragment)
 	const char* vertexSource = "#version 460 compatibility\n"
 		"layout (location = 0) in vec3 aPos;\n"
 		"void main()\n"
 		"{\n"
 		"gl_Position = vec4(aPos, 1.0);\n"
 		"}\n";
-	// Create shader
-	GLuint vertexShader;
-	vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	// Add vertex shader source
-	glShaderSource(vertexShader, 1, &vertexSource, NULL);
-	// Compile vertex shader
-	glCompileShader(vertexShader);
-	// Get compilation status
-	int status;
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &status);
-	// Temporary fragment shader
 
 	const char* fragSource = "#version 460 compatibility\n"
 		"out vec4 color;\n"
 		"void main()\n"
 		"{\n"
-		"color = vec4(1.0f, 1.0f, 1.0f, 1.0f);\n"
+		"color = vec4(1.0, 1.0, 1.0, 1.0);\n"
 		"}\n";
 
-	GLuint fragShader;
-	fragShader = glCreateShader(GL_FRAGMENT_SHADER);
+	// Compile vertex shader
+	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vertexShader, 1, &vertexSource, NULL);
+	glCompileShader(vertexShader);
+	checkShader(vertexShader, "Vertex");
 
+	// Compile fragment shader
+	GLuint fragShader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragShader, 1, &fragSource, NULL);
-
 	glCompileShader(fragShader);
+	checkShader(fragShader, "Fragment");
 
-	
-	glGetShaderiv(fragShader, GL_COMPILE_STATUS, &status);
-	// Create shader program
-	GLuint shaderProgram;
-	shaderProgram = glCreateProgram();
-	// Attach shaders to the program
+	// Link shader program
+	GLuint shaderProgram = glCreateProgram();
 	glAttachShader(shaderProgram, vertexShader);
 	glAttachShader(shaderProgram, fragShader);
-	// Link program
 	glLinkProgram(shaderProgram);
-	// Check the link status
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &status);
-	reportSPError(shaderProgram);
-	// Use program
-	glUseProgram(shaderProgram);
-	// The program is now created and linked, so we can delete the shaders!
+	checkProgram(shaderProgram);
+
+	
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragShader);
-	// Create vertex array and buffer objects
+
+	
 	GLuint VAO, VBO;
-	// Generate VAO and VBO
 	glGenVertexArrays(1, &VAO);
-	glGenVertexArrays(1, &VBO);
-	// Bind VAO and VBO
+	glGenBuffers(1, &VBO);
+
 	glBindVertexArray(VAO);
-	glBindVertexArray(VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 
 	SDL_Event event{};
 
@@ -159,19 +155,33 @@ int main() {
 				running = false;
 				break;
 			case SDL_EVENT_KEY_DOWN:
-				if (event.key.down == SDLK_ESCAPE) {
+				if (event.key.key == SDLK_ESCAPE) {
 					running = false;
-					break;
+				}
+				break;
 			default:
 				break;
-				}
 			}
 		}
-		glViewport(window.getX(), window.getY(), window.getWidth(width), window.getHeight(height));
+
+		
+		int width, height;
+		SDL_GetWindowSizeInPixels(window.getWindow().get(), &width, &height);
+		glViewport(0, 0, width, height);
+
 		glClearColor(0.f, 0.f, 0.f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT);
+
+		glUseProgram(shaderProgram);
+		glBindVertexArray(VAO);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+
 		SDL_GL_SwapWindow(window.getWindow().get());
 	}
+
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
+	glDeleteProgram(shaderProgram);
 
 	return 0;
 }
