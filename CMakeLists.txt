@@ -36,6 +36,7 @@ set(LIBUSB_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(zlib libusb)
 
+# Provide FindZLIB output variables globally for libzip & libzippp
 if(TARGET zlib)
     set(ZLIB_FOUND TRUE CACHE BOOL "" FORCE)
     set(ZLIB_LIBRARY zlib CACHE STRING "" FORCE)
@@ -76,6 +77,10 @@ set(SDL_TEST_LIBRARY OFF CACHE BOOL "" FORCE)
 set(SDL_TESTS OFF CACHE BOOL "" FORCE)
 set(SDL_EXAMPLES OFF CACHE BOOL "" FORCE)
 
+# Prevent SDL3_image from building redundant vendored zlib
+set(SDLIMAGE_VENDORED OFF CACHE BOOL "" FORCE)
+set(SDLIMAGE_ZLIB OFF CACHE BOOL "" FORCE)
+
 FetchContent_Declare(
     SDL3_image
     GIT_REPOSITORY "https://github.com/libsdl-org/SDL_image.git"
@@ -83,7 +88,6 @@ FetchContent_Declare(
 )
 set(SDLIMAGE_SAMPLES OFF CACHE BOOL "" FORCE)
 set(SDLIMAGE_TESTS OFF CACHE BOOL "" FORCE)
-set(SDLIMAGE_VENDORED ON CACHE BOOL "" FORCE)
 set(SDLIMAGE_DEPS_SHARED ON CACHE BOOL "" FORCE)
 
 FetchContent_Declare(
@@ -169,7 +173,7 @@ set(BUILD_DOC OFF CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(libzip)
 
-
+# Configure FindLIBZIP variables for libzippp
 set(LIBZIP_FOUND TRUE CACHE BOOL "" FORCE)
 set(LIBZIP_LIBRARIES zip CACHE STRING "" FORCE)
 set(LIBZIP_INCLUDE_DIRS "libzipSOURCEDIR/lib;{libzip_BINARY_DIR}" CACHE STRING "" FORCE)
@@ -182,7 +186,7 @@ endif()
 
 FetchContent_Declare(
     libzippp
-    GIT_REPOSITORY "https://github.com/ctrabant/libzippp.git"
+    GIT_REPOSITORY "https://github.com/ctrabant/libzippp"
     GIT_TAG        "libzippp-v1.0.1-1.10.1"
 )
 set(LIBZIPPP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
@@ -351,7 +355,7 @@ target_link_libraries(blurbo_window PUBLIC
     LibUSB::LibUSB
 )
 
-
+# blurbo_editor
 file(GLOB_RECURSE BLURBO_EDITOR_SOURCES CONFIGURE_DEPENDS
     "blurbo_editor/src/*.cpp"
     "blurbo_editor/src/*.hpp"
