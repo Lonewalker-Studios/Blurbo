@@ -18,9 +18,6 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 include(FetchContent)
 
-# ------------------------------------------------------------------------------
-# 1. ZLIB & LibUSB
-# ------------------------------------------------------------------------------
 FetchContent_Declare(
     zlib
     GIT_REPOSITORY "https://github.com/madler/zlib.git"
@@ -38,14 +35,12 @@ set(LIBUSB_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(zlib libusb)
 
-# Export ZLIB variables globally for libzip & libzippp
 if(TARGET zlib)
     set(ZLIB_FOUND TRUE CACHE BOOL "" FORCE)
     set(ZLIB_LIBRARY zlib CACHE STRING "" FORCE)
     set(ZLIB_LIBRARIES zlib CACHE STRING "" FORCE)
     set(ZLIB_INCLUDE_DIR "${zlib_SOURCE_DIR};${zlib_BINARY_DIR}" CACHE STRING "" FORCE)
     set(ZLIB_INCLUDE_DIRS "${zlib_SOURCE_DIR};${zlib_BINARY_DIR}" CACHE STRING "" FORCE)
-    set(ZLIB_VERSION_STRING "1.3.1" CACHE STRING "" FORCE)
     if(NOT TARGET ZLIB::ZLIB)
         add_library(ZLIB::ZLIB ALIAS zlib)
     endif()
@@ -55,7 +50,6 @@ elseif(TARGET zlibstatic)
     set(ZLIB_LIBRARIES zlibstatic CACHE STRING "" FORCE)
     set(ZLIB_INCLUDE_DIR "${zlib_SOURCE_DIR};${zlib_BINARY_DIR}" CACHE STRING "" FORCE)
     set(ZLIB_INCLUDE_DIRS "${zlib_SOURCE_DIR};${zlib_BINARY_DIR}" CACHE STRING "" FORCE)
-    set(ZLIB_VERSION_STRING "1.3.1" CACHE STRING "" FORCE)
     if(NOT TARGET ZLIB::ZLIB)
         add_library(ZLIB::ZLIB ALIAS zlibstatic)
     endif()
@@ -67,9 +61,6 @@ if(TARGET usb-1.0 AND NOT TARGET LibUSB::LibUSB)
     set(LIBUSB_FOUND TRUE CACHE BOOL "" FORCE)
 endif()
 
-# ------------------------------------------------------------------------------
-# 2. LIBZIP (Must be made available BEFORE libzippp)
-# ------------------------------------------------------------------------------
 FetchContent_Declare(
     libzip
     GIT_REPOSITORY "https://github.com/nih-at/libzip.git"
@@ -82,7 +73,6 @@ set(BUILD_DOC OFF CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(libzip)
 
-# Export LIBZIP variables globally for libzippp
 set(LIBZIP_FOUND TRUE CACHE BOOL "" FORCE)
 set(LIBZIP_LIBRARIES zip CACHE STRING "" FORCE)
 set(LIBZIP_LIBRARY zip CACHE STRING "" FORCE)
@@ -93,20 +83,13 @@ if(NOT TARGET libzip::zip)
     add_library(libzip::zip ALIAS zip)
 endif()
 
-# ------------------------------------------------------------------------------
-# 3. LIBZIPPP
-# ------------------------------------------------------------------------------
 FetchContent_Declare(
     libzippp
     GIT_REPOSITORY "https://github.com/stbrumme/libzippp.git"
     GIT_TAG        "master"
+    SOURCE_SUBDIR  "__download_only__"
 )
-set(LIBZIPPP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(LIBZIPPP_INSTALL OFF CACHE BOOL "" FORCE)
 
-# ------------------------------------------------------------------------------
-# 4. Other Dependencies
-# ------------------------------------------------------------------------------
 FetchContent_Declare(
     SDL3
     GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git"
@@ -210,9 +193,11 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(libzippp SDL3 SDL3_image box2d entt lua sol2 glm fmt tinyxml2)
 
-# ------------------------------------------------------------------------------
-# Manual Header / Helper Libraries
-# ------------------------------------------------------------------------------
+add_library(libzippp STATIC ${libzippp_SOURCE_DIR}/src/libzippp.cpp)
+target_include_directories(libzippp PUBLIC ${libzippp_SOURCE_DIR}/src)
+target_link_libraries(libzippp PUBLIC libzip::zip ZLIB::ZLIB)
+add_library(libzippp::libzippp ALIAS libzippp)
+
 file(GLOB LUA_SOURCES "${lua_SOURCE_DIR}/*.c")
 list(FILTER LUA_SOURCES EXCLUDE REGEX ".*/(lua|luac|onelua|ltests)\\.c$")
 
@@ -273,9 +258,6 @@ FetchContent_MakeAvailable(glad)
 
 find_package(OpenGL REQUIRED)
 
-# ------------------------------------------------------------------------------
-# Sub-Project Targets
-# ------------------------------------------------------------------------------
 set(BLURBO_PROJECTS blurbo_utilities blurbo_window blurbo_editor)
 
 foreach(BLURBO_PROJ IN LISTS BLURBO_PROJECTS)
@@ -309,7 +291,6 @@ endforeach()
 
 glad_add_library(GLAD SHARED REPRODUCIBLE API gl:compatibility=4.6)
 
-# blurbo_utilities
 file(GLOB_RECURSE BLURBO_UTILITIES_SOURCES CONFIGURE_DEPENDS
     "blurbo_utilities/src/*.cpp"
     "blurbo_utilities/src/*.hpp"
@@ -343,7 +324,6 @@ target_link_libraries(blurbo_utilities PUBLIC
     LibUSB::LibUSB
 )
 
-# blurbo_window
 file(GLOB_RECURSE BLURBO_WINDOW_SOURCES CONFIGURE_DEPENDS
     "blurbo_window/src/*.cpp"
     "blurbo_window/src/*.hpp"
@@ -369,7 +349,6 @@ target_link_libraries(blurbo_window PUBLIC
     LibUSB::LibUSB
 )
 
-# blurbo_editor
 file(GLOB_RECURSE BLURBO_EDITOR_SOURCES CONFIGURE_DEPENDS
     "blurbo_editor/src/*.cpp"
     "blurbo_editor/src/*.hpp"
