@@ -63,7 +63,7 @@ if(NOT TARGET ZLIB::ZLIB)
     add_library(ZLIB::ZLIB INTERFACE IMPORTED GLOBAL)
     set_target_properties(ZLIB::ZLIB PROPERTIES
         INTERFACE_LINK_LIBRARIES "${BLURBO_ZLIB_TARGET}"
-        INTERFACE_INCLUDE_DIRECTORIES "zlibSOURCEDIR;{zlib_BINARY_DIR}"
+        INTERFACE_INCLUDE_DIRECTORIES "${zlib_SOURCE_DIR};${zlib_BINARY_DIR}"
     )
 endif()
 
@@ -305,11 +305,11 @@ glad_add_library(GLAD SHARED REPRODUCIBLE API gl:compatibility=4.6)
 set(BLURBO_PROJECTS blurbo_utilities blurbo_window blurbo_editor)
 
 foreach(BLURBO_PROJ IN LISTS BLURBO_PROJECTS)
-    set(BLURBO_PROJ_DIR "CMAKECURRENTSOURCEDIR/{BLURBO_PROJ}")
+    set(BLURBO_PROJ_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${BLURBO_PROJ}")
 
     foreach(BLURBO_SUBDIR src include)
-        if(NOT EXISTS "BLURBOPROJDIR/{BLURBO_SUBDIR}")
-            file(MAKE_DIRECTORY "BLURBOPROJDIR/{BLURBO_SUBDIR}")
+        if(NOT EXISTS "${BLURBO_PROJ_DIR}/${BLURBO_SUBDIR}")
+            file(MAKE_DIRECTORY "${BLURBO_PROJ_DIR}/${BLURBO_SUBDIR}")
         endif()
     endforeach()
 
@@ -327,7 +327,7 @@ int main(int argc, char** argv)
 }
 ]=])
         else()
-            file(WRITE "BLURBOPROJDIR/src/{BLURBO_PROJ}.cpp"
+            file(WRITE "${BLURBO_PROJ_DIR}/src/${BLURBO_PROJ}.cpp"
                 "void ${BLURBO_PROJ}_placeholder() {}\n")
         endif()
     endif()
@@ -431,4 +431,3 @@ target_link_libraries(blurbo_editor PRIVATE
 )
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT blurbo_editor)
-
