@@ -18,7 +18,9 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 include(FetchContent)
 
-
+# ------------------------------------------------------------------------------
+# 1. ZLIB & LibUSB
+# ------------------------------------------------------------------------------
 FetchContent_Declare(
     zlib
     GIT_REPOSITORY "https://github.com/madler/zlib.git"
@@ -36,13 +38,13 @@ set(LIBUSB_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(zlib libusb)
 
-# Provide FindZLIB output variables globally for libzip & libzippp
+# Export ZLIB variables globally for libzip & libzippp
 if(TARGET zlib)
     set(ZLIB_FOUND TRUE CACHE BOOL "" FORCE)
     set(ZLIB_LIBRARY zlib CACHE STRING "" FORCE)
     set(ZLIB_LIBRARIES zlib CACHE STRING "" FORCE)
-    set(ZLIB_INCLUDE_DIR "zlibSOURCEDIR;{zlib_BINARY_DIR}" CACHE STRING "" FORCE)
-    set(ZLIB_INCLUDE_DIRS "zlibSOURCEDIR;{zlib_BINARY_DIR}" CACHE STRING "" FORCE)
+    set(ZLIB_INCLUDE_DIR "${zlib_SOURCE_DIR};${zlib_BINARY_DIR}" CACHE STRING "" FORCE)
+    set(ZLIB_INCLUDE_DIRS "${zlib_SOURCE_DIR};${zlib_BINARY_DIR}" CACHE STRING "" FORCE)
     set(ZLIB_VERSION_STRING "1.3.1" CACHE STRING "" FORCE)
     if(NOT TARGET ZLIB::ZLIB)
         add_library(ZLIB::ZLIB ALIAS zlib)
@@ -51,8 +53,8 @@ elseif(TARGET zlibstatic)
     set(ZLIB_FOUND TRUE CACHE BOOL "" FORCE)
     set(ZLIB_LIBRARY zlibstatic CACHE STRING "" FORCE)
     set(ZLIB_LIBRARIES zlibstatic CACHE STRING "" FORCE)
-    set(ZLIB_INCLUDE_DIR "zlibSOURCEDIR;{zlib_BINARY_DIR}" CACHE STRING "" FORCE)
-    set(ZLIB_INCLUDE_DIRS "zlibSOURCEDIR;{zlib_BINARY_DIR}" CACHE STRING "" FORCE)
+    set(ZLIB_INCLUDE_DIR "${zlib_SOURCE_DIR};${zlib_BINARY_DIR}" CACHE STRING "" FORCE)
+    set(ZLIB_INCLUDE_DIRS "${zlib_SOURCE_DIR};${zlib_BINARY_DIR}" CACHE STRING "" FORCE)
     set(ZLIB_VERSION_STRING "1.3.1" CACHE STRING "" FORCE)
     if(NOT TARGET ZLIB::ZLIB)
         add_library(ZLIB::ZLIB ALIAS zlibstatic)
@@ -65,7 +67,46 @@ if(TARGET usb-1.0 AND NOT TARGET LibUSB::LibUSB)
     set(LIBUSB_FOUND TRUE CACHE BOOL "" FORCE)
 endif()
 
+# ------------------------------------------------------------------------------
+# 2. LIBZIP (Must be made available BEFORE libzippp)
+# ------------------------------------------------------------------------------
+FetchContent_Declare(
+    libzip
+    GIT_REPOSITORY "https://github.com/nih-at/libzip.git"
+    GIT_TAG        "v1.10.1"
+)
+set(BUILD_TOOLS OFF CACHE BOOL "" FORCE)
+set(BUILD_REGRESS OFF CACHE BOOL "" FORCE)
+set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(BUILD_DOC OFF CACHE BOOL "" FORCE)
 
+FetchContent_MakeAvailable(libzip)
+
+# Export LIBZIP variables globally for libzippp
+set(LIBZIP_FOUND TRUE CACHE BOOL "" FORCE)
+set(LIBZIP_LIBRARIES zip CACHE STRING "" FORCE)
+set(LIBZIP_LIBRARY zip CACHE STRING "" FORCE)
+set(LIBZIP_INCLUDE_DIRS "${libzip_SOURCE_DIR}/lib;${libzip_BINARY_DIR}" CACHE STRING "" FORCE)
+set(LIBZIP_INCLUDE_DIR "${libzip_SOURCE_DIR}/lib;${libzip_BINARY_DIR}" CACHE STRING "" FORCE)
+
+if(NOT TARGET libzip::zip)
+    add_library(libzip::zip ALIAS zip)
+endif()
+
+# ------------------------------------------------------------------------------
+# 3. LIBZIPPP
+# ------------------------------------------------------------------------------
+FetchContent_Declare(
+    libzippp
+    GIT_REPOSITORY "https://github.com/stbrumme/libzippp.git"
+    GIT_TAG        "master"
+)
+set(LIBZIPPP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(LIBZIPPP_INSTALL OFF CACHE BOOL "" FORCE)
+
+# ------------------------------------------------------------------------------
+# 4. Other Dependencies
+# ------------------------------------------------------------------------------
 FetchContent_Declare(
     SDL3
     GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git"
@@ -77,9 +118,9 @@ set(SDL_TEST_LIBRARY OFF CACHE BOOL "" FORCE)
 set(SDL_TESTS OFF CACHE BOOL "" FORCE)
 set(SDL_EXAMPLES OFF CACHE BOOL "" FORCE)
 
-# Prevent SDL3_image from building redundant vendored zlib
 set(SDLIMAGE_VENDORED OFF CACHE BOOL "" FORCE)
 set(SDLIMAGE_ZLIB OFF CACHE BOOL "" FORCE)
+set(SDLIMAGE_AVIF OFF CACHE BOOL "" FORCE)
 
 FetchContent_Declare(
     SDL3_image
@@ -162,45 +203,16 @@ FetchContent_Declare(
 )
 
 FetchContent_Declare(
-    libzip
-    GIT_REPOSITORY "https://github.com/nih-at/libzip.git"
-    GIT_TAG        "v1.10.1"
-)
-set(BUILD_TOOLS OFF CACHE BOOL "" FORCE)
-set(BUILD_REGRESS OFF CACHE BOOL "" FORCE)
-set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-set(BUILD_DOC OFF CACHE BOOL "" FORCE)
-
-FetchContent_MakeAvailable(libzip)
-
-# Configure FindLIBZIP variables for libzippp
-set(LIBZIP_FOUND TRUE CACHE BOOL "" FORCE)
-set(LIBZIP_LIBRARIES zip CACHE STRING "" FORCE)
-set(LIBZIP_INCLUDE_DIRS "libzipSOURCEDIR/lib;{libzip_BINARY_DIR}" CACHE STRING "" FORCE)
-set(LIBZIP_LIBRARY zip CACHE STRING "" FORCE)
-set(LIBZIP_INCLUDE_DIR "libzipSOURCEDIR/lib;{libzip_BINARY_DIR}" CACHE STRING "" FORCE)
-
-if(NOT TARGET libzip::zip)
-    add_library(libzip::zip ALIAS zip)
-endif()
-
-FetchContent_Declare(
-    libzippp
-    GIT_REPOSITORY "https://github.com/ctrabant/libzippp"
-    GIT_TAG        "libzippp-v1.0.1-1.10.1"
-)
-set(LIBZIPPP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(LIBZIPPP_INSTALL OFF CACHE BOOL "" FORCE)
-
-FetchContent_Declare(
     tinyxml2
     GIT_REPOSITORY "https://github.com/leethomason/tinyxml2.git"
     GIT_TAG        "10.0.0"
 )
 
-FetchContent_MakeAvailable(SDL3 SDL3_image box2d entt lua sol2 glm fmt libzippp tinyxml2)
+FetchContent_MakeAvailable(libzippp SDL3 SDL3_image box2d entt lua sol2 glm fmt tinyxml2)
 
-
+# ------------------------------------------------------------------------------
+# Manual Header / Helper Libraries
+# ------------------------------------------------------------------------------
 file(GLOB LUA_SOURCES "${lua_SOURCE_DIR}/*.c")
 list(FILTER LUA_SOURCES EXCLUDE REGEX ".*/(lua|luac|onelua|ltests)\\.c$")
 
@@ -261,15 +273,17 @@ FetchContent_MakeAvailable(glad)
 
 find_package(OpenGL REQUIRED)
 
-
+# ------------------------------------------------------------------------------
+# Sub-Project Targets
+# ------------------------------------------------------------------------------
 set(BLURBO_PROJECTS blurbo_utilities blurbo_window blurbo_editor)
 
 foreach(BLURBO_PROJ IN LISTS BLURBO_PROJECTS)
-    set(BLURBO_PROJ_DIR "CMAKECURRENTSOURCEDIR/{BLURBO_PROJ}")
+    set(BLURBO_PROJ_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${BLURBO_PROJ}")
 
     foreach(BLURBO_SUBDIR src include)
-        if(NOT EXISTS "BLURBOPROJDIR/{BLURBO_SUBDIR}")
-            file(MAKE_DIRECTORY "BLURBOPROJDIR/{BLURBO_SUBDIR}")
+        if(NOT EXISTS "${BLURBO_PROJ_DIR}/${BLURBO_SUBDIR}")
+            file(MAKE_DIRECTORY "${BLURBO_PROJ_DIR}/${BLURBO_SUBDIR}")
         endif()
     endforeach()
 
@@ -287,7 +301,7 @@ int main(int argc, char** argv)
 }
 ]=])
         else()
-            file(WRITE "BLURBOPROJDIR/src/{BLURBO_PROJ}.cpp"
+            file(WRITE "${BLURBO_PROJ_DIR}/src/${BLURBO_PROJ}.cpp"
                 "void ${BLURBO_PROJ}_placeholder() {}\n")
         endif()
     endif()
@@ -295,7 +309,7 @@ endforeach()
 
 glad_add_library(GLAD SHARED REPRODUCIBLE API gl:compatibility=4.6)
 
-
+# blurbo_utilities
 file(GLOB_RECURSE BLURBO_UTILITIES_SOURCES CONFIGURE_DEPENDS
     "blurbo_utilities/src/*.cpp"
     "blurbo_utilities/src/*.hpp"
@@ -329,7 +343,7 @@ target_link_libraries(blurbo_utilities PUBLIC
     LibUSB::LibUSB
 )
 
-
+# blurbo_window
 file(GLOB_RECURSE BLURBO_WINDOW_SOURCES CONFIGURE_DEPENDS
     "blurbo_window/src/*.cpp"
     "blurbo_window/src/*.hpp"
@@ -404,4 +418,3 @@ if(WIN32)
 endif()
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT blurbo_editor)
-
