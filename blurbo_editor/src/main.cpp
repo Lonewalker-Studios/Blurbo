@@ -5,10 +5,24 @@
 #include <iostream>
 #include <SOIL2.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+class Camera2D {
+private:
+	int width;
+	int height;
+	float scale;
+	glm::vec2 position;
+	glm::mat4 cameraMatrix, orthoProjection;
+	bool needsUpdate;
 
+public:
+	Camera2D(int width, int height) : width{ width } {
+
+	}
+};
 struct UVs {
 	float u, v, width, height;
-	UVs() : u{ 0.f }, v{ 0.f }, width{0.f}, height{0.f} {
+	UVs() : u{ 0.f }, v{ 0.f }, width{ 0.f }, height{ 0.f } {
 
 	}
 };
@@ -134,15 +148,23 @@ int main() {
 	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 	int texWidth{ 0 }, texHeight{ 0 };
-	if (!loadTexture("Content/textures/bake.png", texWidth, texHeight, false)) {
+	if (!loadTexture("Content/textures/32x32.jpg", texWidth, texHeight, false)) {
 		return 1;
 	}
+	UVs uvs{};
+	auto generateUVs = [&](float startX, float startY, float spriteWidth, float spriteHeight) {
+		uvs.width = spriteWidth / static_cast<float>(texWidth);
+		uvs.height = spriteHeight / static_cast<float>(texHeight);
+		uvs.u = startX * uvs.width;
+		uvs.v = startY * uvs.height;
+		};
+	generateUVs(1, 1, 16, 16);
 
 	float vertices[] = {
-		-0.5f,  0.5f, 0.0f, 0.f, 0.f,
-		 0.5f,  0.5f, 0.0f, 1.f, 0.f,
-		 0.5f, -0.5f, 0.0f, 1.f, 1.f,
-		-0.5f, -0.5f, 0.0f, 0.f, 1.f
+		-0.5f,  0.5f, 0.0f, uvs.u, uvs.v,
+		 0.5f,  0.5f, 0.0f, (uvs.u + uvs.width), uvs.v,
+		 0.5f, -0.5f, 0.0f, (uvs.u + uvs.width), (uvs.v + uvs.height),
+		-0.5f, -0.5f, 0.0f, uvs.u, (uvs.v + uvs.height)
 	};
 	GLuint indices[] = {
 		0, 1, 2,
