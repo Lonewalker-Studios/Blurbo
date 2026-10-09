@@ -4,6 +4,14 @@
 #include <string>
 #include <iostream>
 #include <SOIL2.h>
+#include <glm/glm.hpp>
+
+struct UVs {
+	float u, v, width, height;
+	UVs() : u{ 0.f }, v{ 0.f }, width{0.f}, height{0.f} {
+
+	}
+};
 
 bool loadTexture(const std::string& path, int& width, int& height, bool blended) {
 	int channels = 0;

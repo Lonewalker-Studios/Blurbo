@@ -404,6 +404,22 @@ file(GLOB_RECURSE BLURBO_EDITOR_SOURCES CONFIGURE_DEPENDS
 
 add_executable(blurbo_editor ${BLURBO_EDITOR_SOURCES})
 
+set(BLURBO_CONTENT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Content")
+file(MAKE_DIRECTORY "${BLURBO_CONTENT_DIR}")
+
+add_custom_target(blurbo_copy_content ALL
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${BLURBO_CONTENT_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different
+        "${BLURBO_CONTENT_DIR}"
+        "$<TARGET_FILE_DIR:blurbo_editor>/Content"
+    COMMENT "Copying Content folder..."
+)
+add_dependencies(blurbo_editor blurbo_copy_content)
+
+set_target_properties(blurbo_editor PROPERTIES
+    VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:blurbo_editor>"
+)
+
 target_include_directories(blurbo_editor PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/blurbo_editor/include
 )
